@@ -1,0 +1,144 @@
+import math
+def distance(X,Y):
+    dist = (X[0]-Y[0])*(X[0]-Y[0])+(X[1]-Y[1])*(X[1]-Y[1])+(X[2]-Y[2])*(X[2]-Y[2])
+    dist = math.sqrt(dist)
+    return dist
+
+n1 = 75
+n2 = 107
+X = []
+Y = []
+y = []
+gray = 0
+Gray = 0
+White = 0
+Mean1 = []
+Mean2 = []
+
+Max = [0.0,0.0,0.0]
+Min = [1000000.0,1000000.0,1000000.0]
+
+for i in range(0,n1):
+    filename = '../Resource/TrainData/Demented/Nearest/Image'+str(i)+'.txt'
+    f = open(filename)
+    Data = f.read().split()
+    
+    for k in range(0,3):
+        if float(Data[k])<Min[k]:
+            Min[k] = float(Data[k])
+        if float(Data[k])>Max[k]:
+            Max[k] = float(Data[k])
+
+    Gray = Gray+float(Data[0])
+    gray = gray+float(Data[1])
+    White = White+float(Data[2])     
+    print "Successfully read Demented Image",i
+
+Gray = Gray/n1
+gray = gray/n1
+White = White/n1
+Mean1.append(Gray)
+Mean1.append(gray)
+Mean1.append(White)
+
+Gray =  0
+gray =  0
+White = 0
+
+for j in range(0,n2):
+    filename = '../Resource/TrainData/NotDemented/Nearest/Image'+str(j)+'.txt'
+    f = open(filename)
+    Data = f.read().split()
+
+    for k in range(0,3):
+        if float(Data[k])<Min[k]:
+            Min[k] = float(Data[k])
+        if float(Data[k])>Max[k]:
+            Max[k] = float(Data[k])
+
+    Gray = Gray+float(Data[0])
+    gray = gray+float(Data[1])
+    White = White+float(Data[2])    
+    print "Successfully read NotDemented Image",j
+
+Gray = Gray/n2
+gray = gray/n2
+White = White/n2
+Mean2.append(Gray)
+Mean2.append(gray)
+Mean2.append(White)
+
+Gray =  0
+gray =  0
+White = 0
+
+print Mean1
+print Mean2
+
+Tn1 = 19
+Tn2 = 16
+
+for p in range(0,Tn1): 
+    filename = '../Resource/TestData/Demented/Nearest/Image'+str(p)+'.txt'
+    f = open(filename)
+    Data = f.read().split()
+    for m in range(0,3):
+        X.append(float(Data[m]))
+    dist1 = distance(Mean1,X)
+    dist2 = distance(Mean2,X)
+    Y.append(0)
+    if(dist1>dist2):
+        y.append(1)
+    else:
+        y.append(0)
+    del X[:]
+    print "Successfully read Demented Image",p
+
+
+for q in range(0,Tn2): 
+    filename = '../Resource/TestData/NotDemented/Nearest/Image'+str(q)+'.txt'
+    f = open(filename)
+    Data = f.read().split()
+    for m in range(0,3):
+        X.append(float(Data[m]))
+    dist1 = distance(Mean1,X)
+    dist2 = distance(Mean2,X)
+    Y.append(1)
+    if(dist1>dist2):
+        y.append(1)
+    else:
+        y.append(0)
+    del X[:]
+    print "Successfully read NotDemented Image",q
+
+accurate = 0.0
+TP = 0
+TN = 0
+FP = 0
+FN = 0
+
+for z in range(len(Y)):
+    if Y[z]-y[z] == 0:
+        accurate = accurate+1
+accuracy = accurate/(Tn1+Tn2)*100.0
+
+for Z in range(len(Y)):
+    if Y[Z]==0 and y[Z]==0:
+        TP = TP+1
+    if Y[Z]==1 and y[Z]==0:
+        FP = FP+1
+    if Y[Z]==0 and y[Z]==1:
+        FN = FN+1
+    if Y[Z]==1 and y[Z]==1:
+        TN = TN+1
+
+print Y
+print y
+print 'Accuracy: ' , accuracy
+print 'TP:',TP
+print 'TN:',TN
+print 'FP:',FP
+print 'FN:',FN
+
+print 'Max: ', Max
+print 'Min: ', Min

@@ -1,0 +1,119 @@
+import math
+
+'''Measurement of Euclidean Distance between Feature Vectors '''
+def edistance(X,Y):
+    dist = 0
+    for i in range(len(X)):
+        dist = dist+(X[i]-Y[i])*(X[i]-Y[i])
+    dist = math.sqrt(dist)
+    return dist
+
+'''Assigning Majority Class Label to the label of New Instance'''
+def getLabel(X):
+    count1 = 0
+    for x in range(len(X)):
+        if X[x]==1:
+            count1 = count1+1
+    count0 = len(X)-count1
+
+    if count1>count0:
+        label = 1
+    else:
+        label = 0
+    return label
+
+'''Final Result Along with Confusion Matrix'''
+def Confusion(a,b,c,d):
+    '''print '\n\t\t\tConfusion matrix\n'
+    print '\t\t\t Target Values\n'
+    print 'Prediction \t Positive(0) \t Neagative(1)\n'
+    print 'Positive(0) \t   ',a,'\t\t','  ',b
+    print 'Negative(1) \t   ',c,'\t\t','  ',d
+    print '\n'
+    '''
+    Accuracy =(float) (a+d)/(a+b+c+d)*100
+    Sensitivity = (float)(a)/(a+c)*100
+    Specificity = (float)(d)/(b+d)*100
+    print 'K = ',K,'Accuracy = ' , Accuracy,'%',' Sensitivity = ',Sensitivity,'%',' Specificity = ',Specificity,'%'
+    ''' print 'Sensitivity : ' , Sensitivity
+    print 'Specificity : ' , Specificity
+    print '\n'''
+
+''' Best Approximated Value of Nearest Neighbours'''
+
+N1 = 75
+N2 = 107
+
+Tn1 = 25
+Tn2 = 28
+
+# List of Training Data of type [(_,_,_),_]
+Train = []
+# List of Test Data of type [(_,_,_),_]
+Test = []
+predicted = []
+actual_val = []
+for i in range(0,N1):
+    filename = '../Resource/TrainData/Demented/Nearest/Image'+str(i)+'.txt'
+    Data = [float(x) for x in open(filename).read().split()]
+    data_sample = (tuple(Data),0)
+    Train.append(data_sample)
+
+for j in range(0,N2):
+    filename = '../Resource/TrainData/NotDemented/Nearest/Image'+str(j)+'.txt'
+    Data = [float(x) for x in open(filename).read().split()]
+    data_sample = (tuple(Data),1)
+    Train.append(data_sample)
+
+for k in range(0,Tn1):
+    filename = '../Resource/TestData/Demented/Nearest/Image'+str(k)+'.txt'
+    Data = [float(x) for x in open(filename).read().split()]
+    data_sample = (tuple(Data),0)
+    Test.append(data_sample)
+    actual_val.append(0)
+
+for l in range(0,Tn2):
+    filename = '../Resource/TestData/NotDemented/Nearest/Image'+str(l)+'.txt'
+    Data = [float(x) for x in open(filename).read().split()]
+    data_sample = (tuple(Data),1) 
+    Test.append(data_sample)
+    actual_val.append(1)
+
+for K in range(1,182):
+    dist_vector = [1.0e+15]*K
+    labe_vector = [1]*K
+
+    '''KNN alorithm to test the new instances'''
+
+    for feature,label in Test:
+        for Feature,Label in Train:
+            dist = edistance(Feature,feature)
+            for L in range(K):
+                if dist<dist_vector[L]:
+                    dist_vector[L] = dist
+                    labe_vector[L] = Label
+                    break
+    
+        newLabel = getLabel(labe_vector)
+        predicted.append(newLabel)
+    '''Classification Matrics Measurement'''
+    a = 0
+    b = 0
+    c = 0
+    d = 0
+
+    #print '\nTarget_Value :',actual_val
+    #print 'Prediction   :',predicted
+
+    for z in range(len(predicted)):
+        if predicted[z] == 0 and actual_val[z] == 0:
+            a = a + 1
+        if predicted[z] == 0 and actual_val[z] == 1:
+            b = b + 1 
+        if predicted[z] == 1 and actual_val[z] == 0:
+            c = c + 1
+        if predicted[z] == 1 and actual_val[z] == 1:
+            d = d + 1
+
+    Confusion(a,b,c,d)
+    del predicted[:]
