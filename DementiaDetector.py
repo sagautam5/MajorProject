@@ -33,17 +33,20 @@ def getLabel(Labels):
     else:
         label = 0
     return label
-Action = raw_input("Training Feature Extraction Yes or No  ??")
 
+""" Acessing java class Dementia from package Feature Extraction 
+to calculate Feature Vector"""
+Action = raw_input("Training Feature Extraction Yes or No  ??")
 startJVM(jpype.getDefaultJVMPath());
-myPackage = JPackage('FeatureExtraction').org.classes
-Dementia = myPackage.Dementia
+myPackage = JPackage('FeatureExtraction').org.classes #Location of Dementia.class
+Dementia = myPackage.Dementia                         # Dementia.class file acess
 
 if Action == "Yes":
-    Dementia.System("Train")
+    Dementia.System("Train")                          #static function System(...) call
 Source = raw_input("Enter Test Image File Location:")
-String = Dementia.System("Test",Source)
-Features = [float(x) for x in String.split()]
+String = Dementia.System("Test",Source)               #static function System(....,....) call
+Features = [float(x) for x in String.split()]         # we get feature vector as string so to get numeric 
+                                                      # spliting is required.
 
 ''' Best Approximated Value of Nearest Neighbours'''
 K = 7
@@ -83,17 +86,22 @@ for Feature,Label in Train:
             dist_vector[L] = dist
             labe_vector[L] = Label
             break
-
-newLabel = getLabel(labe_vector)
+#Assignment of majority label to label of test feature vector
+newLabel = getLabel(labe_vector) 
 if  newLabel==0:
     print "KNN Model: Dementia Positive"
 if  newLabel==1:
     print "KNN Model: Dementia Negative"
 
+#Network Initialization...
 nets = buildNetwork(3,2,2,2,bias = True,hiddenclass=TanhLayer)
+
+#Assigning Weights to the Neural Network from xml file
 nets = NetworkReader.readFrom('filename.xml') 
 
-network_Result = nets.activate(Features)
+#get output of the Neural Netwok
+network_Result = nets.activate(Features) 
+#get final result from output
 prediction = Normalize(network_Result)
 
 if(prediction==[0,1]):
