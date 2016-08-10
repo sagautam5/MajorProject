@@ -1,0 +1,30 @@
+package FeatureExtraction.org.classes;
+class Extractor{
+
+    int factor;
+    String image_Location;
+    String text_Location = "../Resource/User/Text.txt";
+
+    double[][][] Image = new double[144][208][176];
+    double[][][] Data_Nn = new double[9][13][11];
+
+
+    Extractor(String image_Location,int factor){
+
+        this.image_Location = image_Location;
+        this.factor = factor;
+    }
+    double[] Write(){
+
+        double[] volumes = new double[3];
+        ImageReader imageReader = new ImageReader(image_Location);
+        Image = imageReader.getImage();
+
+        Compress compress = new Compress(Image);
+        Data_Nn = compress.getReduced();
+
+        ImageWriter imageWriter = new ImageWriter(Data_Nn,text_Location);
+        volumes = imageWriter.getVolume();
+        return volumes;
+    }
+}

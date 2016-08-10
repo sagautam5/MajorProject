@@ -33,12 +33,15 @@ def getLabel(Labels):
     else:
         label = 0
     return label
+Action = raw_input("Training Feature Extraction Yes or No  ??")
 
-Source = raw_input("Enter Image File Location:")
 startJVM(jpype.getDefaultJVMPath());
 myPackage = JPackage('FeatureExtraction').org.classes
 Dementia = myPackage.Dementia
 
+if Action == "Yes":
+    Dementia.System("Train")
+Source = raw_input("Enter Test Image File Location:")
 String = Dementia.System("Test",Source)
 Features = [float(x) for x in String.split()]
 

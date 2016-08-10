@@ -1,0 +1,62 @@
+package FeatureExtraction.org.classes;
+import java.io.*;
+import java.util.*;
+class ImageWriter{
+    
+    Vector Size;
+    String filename = new String();
+    double matterW = 0.0d;
+    double matterG = 0.0d;
+    double matterg = 0.0d;
+               
+
+    ImageWriter(double[][][] Data, String filename){
+		
+        Size = new Vector(Data.length,Data[0].length,Data[0][0].length);
+        this.filename = filename;
+        int no1_count =0;
+        try{
+            BufferedWriter output = null;
+            File file = new File(filename);
+            output = new BufferedWriter(new FileWriter(file));
+            double data = 0;
+            String BitPat = "",WBP="",GBP="",gBP="";
+//           for(int i=1;i<Size.x-1;i++){ 
+            for(int i=0;i<Size.x;i++){ 
+                for(int j=0;j<Size.y;j++){
+                    for(int k=0;k<Size.z;k++){
+
+                        
+                   data = (double)(Data[i][j][k]);
+
+                   if(data == 85.0d) matterG++;
+                   if(data == 170.0d) matterg++;
+                   if(data == 255.0d) matterW++;
+                    
+                    }
+                    
+                }     
+            }
+
+            matterG = matterG/398.0d;
+            matterg = matterg/398.0d;
+            matterW = matterW/398.0d;
+            BitPat = matterG+" "+matterg+" "+matterW; 
+            output.write(BitPat);
+            output.close();
+
+        }catch(Exception e){
+            System.out.println("ERROR:"+e.getMessage());
+        }
+
+        System.out.println(filename+":File Sucessfully Written");
+    }
+    
+    double[] getVolume(){
+        double[] X = new double[3];
+        X[0] = matterG;
+        X[1] = matterg;
+        X[2] = matterW;
+        return X;
+    } 
+}

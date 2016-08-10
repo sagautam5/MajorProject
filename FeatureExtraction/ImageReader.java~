@@ -1,0 +1,69 @@
+package FeatureExtraction.org.classes;
+import java.io.*;
+import java.util.*;
+import java.awt.*;
+
+import java.nio.*;
+import java.nio.file.*;
+
+class ImageReader{
+
+    double[][][] Image = new double[176][208][176];
+    double[][][] smallImage = new double[144][208][176];
+    
+    ImageReader(String filename){
+
+        try{
+        
+            Path path = Paths.get(filename);
+            byte[] byteArray = Files.readAllBytes(path);
+            ByteBuffer bbuffer = ByteBuffer.wrap(byteArray);
+            
+            //Set the Byte Order
+            bbuffer.order(java.nio.ByteOrder.BIG_ENDIAN);
+            double data = 0.0d;
+            for(int i=0; i<176; i++){
+                for(int j=0; j<208;j++){
+                    for(int k=0; k<176; k++){
+                    // FIXME: check using bbuffer.hasRemaining
+                        short gray_value = bbuffer.getShort();
+                    // converting 16bit grayscale to 8bit byte shifting
+                    // x = (short)(x%256)
+                    gray_value = (short)(gray_value/16);
+                    
+                    if(gray_value>=0 && gray_value<5)
+                        gray_value = 0;
+
+                    else if(gray_value>=5 && gray_value<38)
+                        gray_value = 85;
+                    else if(gray_value>=38 && gray_value<72)
+                        gray_value = 170;
+                    else if(gray_value>=72 && gray_value<256)
+                        gray_value = 255;
+
+                    data = (double)(gray_value);
+        		    Image[i][j][k] = data;
+                    }
+                }
+            }
+
+            for(int a=0;a<144;a++){
+                for(int b=0;b<208;b++){
+                    for(int c=0;c<176;c++){
+                    smallImage[a][b][c] = Image[a+8][b][c];
+                    }
+            
+                }
+            }
+
+        }catch(Exception e){
+            System.out.println(e);
+        }
+    }
+    
+    double[][][] getImage(){
+	return smallImage;
+	}
+}
+
+

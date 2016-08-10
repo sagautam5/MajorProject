@@ -1,0 +1,68 @@
+package FeatureExtraction.org.classes;
+import java.io.*;
+import java.util.*;
+
+class Reduce{
+
+    Vector size,size_Nn,size_Bl,size_Mp;
+    double[][][] Voxel;
+    double[][][] Voxel_Nn;
+    double[][][] Voxel_Bl;
+
+    Reduce(double[][][] Data){
+        
+        size  = new Vector(Data.length,Data[0].length,Data[0][0].length); 
+        Voxel = new double[size.x][size.y][size.z];
+        Voxel = Data;
+    }
+
+    double[][][] Nearest(int factor){
+
+        size_Nn = new Vector(size.x/factor,size.y/factor,size.z/factor);
+        Voxel_Nn = new double[size_Nn.x][size_Nn.y][size_Nn.z];
+
+        for(int i=0;i<size_Nn.x;i++){
+            for(int j=0;j<size_Nn.y;j++){
+                for(int k=0;k<size_Nn.z;k++)
+                    Voxel_Nn[i][j][k] = Voxel[factor*i][factor*j][factor*k]; 
+            }
+        }
+        
+        return Voxel_Nn;
+    }
+
+
+    double[][][] Bilinear(int factor){
+    
+        size_Bl = new Vector(size.x/factor,size.y/factor,size.z/factor);
+        Voxel_Bl = new double[size_Bl.x][size_Bl.y][size_Bl.z];
+
+        double sum = 0.0d;
+        for(int i=0;i<size_Bl.x;i++){
+            for(int j=0;j<size_Bl.y;j++){
+                for(int k=0;k<size_Bl.z;k++){
+
+                    double mean = 0.0d;
+                    for(int p=i*factor;p<factor*i+factor;p++){
+                        for(int q=j*factor;q<j*factor+factor;q++){
+                            for(int r=k*factor;r<k*factor+factor;r++){
+                                mean+= Voxel[p][q][r];
+                                sum += Voxel[p][q][r];
+                            //    System.out.println(p+","+q+","+r);
+                            }
+                        }
+                    }
+                        
+                    mean = mean/(factor*factor*factor);
+		    mean = (int)(mean);
+                    
+                    Voxel_Bl[i][j][k] =mean;
+                }
+            }
+        }
+                    
+        return Voxel_Bl;
+    }
+
+
+}

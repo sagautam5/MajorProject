@@ -1,0 +1,119 @@
+import java.util.*;
+package FeatureExtraction.org.classes;
+public class Dementia{
+
+    public static int factor = 16;
+    
+    //Training Variables
+    public static int file_d_train = 75;
+    public static int file_nd_train = 107;
+
+    public static String Demented_Path_train = "../Resource/TrainData/Demented/";
+    public static String NotDemented_Path_train = "../Resource/TrainData/NotDemented/";
+    
+    public static String[] Demented_train = new String[file_d_train];
+    public static String[] NotDemented_train = new String[file_nd_train];
+
+    public static String[] Text_Demented_train = new String[file_d_train];
+    public static String[] Text_NotDemented_train = new String[file_nd_train];
+    
+    //Testing Variables
+    public static int file_d_test = 25;
+    public static int file_nd_test = 28;
+
+    public static String Demented_Path_test = "../Resource/TestData/Demented/";
+    public static String NotDemented_Path_test = "../Resource/TestData/NotDemented/";
+   
+    
+    public static String[] Demented_test = new String[file_d_test];
+    public static String[] NotDemented_test = new String[file_nd_test];
+
+    public static String[] Text_Demented_test = new String[file_d_test];
+    public static String[] Text_NotDemented_test = new String[file_nd_test];
+    
+    public static double[][][] Image = new double[144][208][176];
+    public static double[][][] Data_Nn  = new double[9][13][11];
+
+    public static String[] FileNames(String path, int count){
+    
+        String[] Files = new String[count];
+       
+        for(int i=0;i<count;i++){
+        
+            Files[i] = path+"Image/Image"+i+".img";
+        }
+        
+        return Files;
+    }
+    public static String[] Text_FileNames(String path, int count){
+    
+        String[] Files = new String[count];
+       
+        for(int i=0;i<count;i++){
+        
+            Files[i] = path+"Nearest/Image"+i+".txt";
+        }
+        
+        return Files;
+    }
+    
+    public static void Write(String[] ImageFile, String[] TextFile, int count){
+    
+        for(int i = 0; i < count; i++){
+        
+            // Read Image File
+            ImageReader imageReader = new ImageReader(ImageFile[i]);
+            Image = imageReader.getImage();
+
+            // Compress Image Data from 176*208*176 to 11*13*11 
+            Compress COM = new Compress(Image);
+            Data_Nn = COM.getReduced();
+
+            //Write Compressed Data into Text file 
+            ImageWriter imageWriter = new ImageWriter(Data_Nn,TextFile[i]);
+        }
+        
+    }
+
+    public static String System(String action, String Location){
+
+        String operation = action;
+        double[] volumes = new double[3];
+
+        //Training and Testing mode
+        if(operation.equals("Train")){
+            //Training Data Extraction
+            Demented_train = FileNames(Demented_Path_train, file_d_train);
+            NotDemented_train = FileNames(NotDemented_Path_train, file_nd_train);
+
+            Text_Demented_train = Text_FileNames(Demented_Path_train, file_d_train);
+            Text_NotDemented_train = Text_FileNames(NotDemented_Path_train, file_nd_train);
+        
+            Write(Demented_train, Text_Demented_train, file_d_train);
+            Write(NotDemented_train,Text_NotDemented_train, file_nd_train);
+        
+            //Testing Data Extraction
+            Demented_test = FileNames(Demented_Path_test, file_d_test);
+            NotDemented_test = FileNames(NotDemented_Path_test, file_nd_test);
+        
+            Text_Demented_test = Text_FileNames(Demented_Path_test, file_d_test);
+            Text_NotDemented_test = Text_FileNames(NotDemented_Path_test, file_nd_test);
+        
+            Write(Demented_test, Text_Demented_test, file_d_test);
+            Write(NotDemented_test,Text_NotDemented_test, file_nd_test);
+        }
+        //User Mode
+        else if(operation.equals("Test")){
+
+            Extractor extractor = new Extractor(Location,factor);
+            volumes = extractor.Write();
+            System.out.println("Test Image Feature Extracting.....");
+        }
+    String volume = volumes[0]+" "+volumes[1]+" "+volumes[2];
+	return volume;
+    }
+    
+    public static void main(String[] args){
+
+    }
+}
