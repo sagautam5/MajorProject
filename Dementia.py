@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 
+
+import sys
+import os
 import math
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk,GdkPixbuf
 from DementiaDetector import on_fileOpen
 
-fileLoc = "/home/abinash/Project/_Project/Dementia/"
-fileLocation = fileLoc + "Resource/Layers/layer"
+
+#fileLoc = "/home/abinash/Project/_Project/Dementia/"
+fileLocation = '/Resource/Layers/layer'
 
 class FileChooserWindow(Gtk.Window):
 
@@ -77,7 +81,7 @@ class Main:
     def on_helpAbout_activate(self, widget):
         print("about")
         self.window1.hide()
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(fileLoc+"Logo.png")
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(os.getcwd()+'Logo.png')
         builder = Gtk.Builder()
         builder.add_from_file("dementia.glade")
         about = builder.get_object("aboutDementia")
@@ -142,7 +146,8 @@ class Window2(Gtk.Window):
         self.imageSlider.set_draw_value(False)
         self.imageSlider.set_digits(0)
 
-        self.imageArea.set_from_file(fileLocation+"88.jpg")
+        fileloc = fileLocation+"88.jpg"
+        self.imageArea.set_from_file(os.getcwd()+fileloc)
 
         self.displayArea.set_editable(False)
 
@@ -185,7 +190,8 @@ class Window2(Gtk.Window):
         pos = self.imageSlider.get_value()
         pos =str(int(pos))
         print(pos)
-        self.imageArea.set_from_file(fileLocation+pos+".jpg")
+        fileloc = fileLocation+pos+".jpg"
+        self.imageArea.set_from_file(os.getcwd()+fileloc)
 
 MainInstance = Main()
 Gtk.main()

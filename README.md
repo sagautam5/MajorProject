@@ -5,6 +5,6 @@ Main purpose of the project is to identify dementia in MRI scan using machine le
 
 
 
-#Note
-Change filelocation in Dementia.py
+
+
 
