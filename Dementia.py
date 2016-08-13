@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-
-import sys
 import os
 import math
 import gi
@@ -48,6 +46,31 @@ class FileChooserWindow(Gtk.Window):
         filter_any.add_pattern("*.img")
         dialog.add_filter(filter_any)
 
+class FileSaveWindow(Gtk.Window):
+    def __init__(self):
+        Gtk.Window.__init__(self)
+        self.filepath = ''
+        self.saveFlag = False
+        self.on_save_clicked(self)
+
+    def on_save_clicked(self, widget):
+        dialog = Gtk.FileChooserDialog("Choose save location", self,
+            Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.filepath = self.filepath + dialog.get_filename()
+            self.saveFlag = True
+            print("File save: " + self.filepath)
+
+        elif response == Gtk.ResponseType.CANCEL:
+            self.saveFlag = False
+            print("Cancel clicked")
+
+        dialog.destroy()
+
 
 
 class Main:
@@ -59,6 +82,8 @@ class Main:
 
         self.window1 = builder1.get_object("window1")
         self.window1.set_default_size(600,338)
+        self.window1.set_position(Gtk.WindowPosition.CENTER)
+        self.window1.set_resizable(False)
         self.window1.show_all()
 
     def on_fileOpen_activate(self, widget):
@@ -73,15 +98,17 @@ class Main:
             self.window1.hide()
 
             window2=Window2(self.window1)
-            window2.set_default_size(600,338)
             window2.set_resizable(True)
+            window2.set_position(Gtk.WindowPosition.CENTER)
+            window2.set_default_size(600,338)
+#            window2.set_resizable(False)
             window2.show_all()
 
 
     def on_helpAbout_activate(self, widget):
         print("about")
         self.window1.hide()
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(os.getcwd()+'Logo.png')
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(os.getcwd()+'Resource/Logo.png')
         builder = Gtk.Builder()
         builder.add_from_file("dementia.glade")
         about = builder.get_object("aboutDementia")
@@ -117,6 +144,7 @@ class Main:
 class Window2(Gtk.Window):
     def __init__(self, window1):
 
+        self.fileloc=''
         self.window1 = window1
         self.adjustment= Gtk.Adjustment(88, 1, 176, 0, 1, 0)
         self.buttonCheck = Gtk.Button(label="Check")
@@ -130,9 +158,7 @@ class Window2(Gtk.Window):
         grid = Gtk.Grid()
         self.add(grid)
 
-        #imageArea.set_size_request(10,10)
-
-        grid.attach(self.imageArea, 0, 0, 10, 10)
+        grid.attach(self.imageArea, 3, 333, 10, 10)
         grid.attach_next_to(self.imageSlider, self.imageArea,
                                 Gtk.PositionType.RIGHT, 1, 10)
         grid.attach_next_to(self.buttonCheck, self.imageArea,
@@ -146,8 +172,8 @@ class Window2(Gtk.Window):
         self.imageSlider.set_draw_value(False)
         self.imageSlider.set_digits(0)
 
-        fileloc = fileLocation+"88.jpg"
-        self.imageArea.set_from_file(os.getcwd()+fileloc)
+        self.fileloc = fileLocation+"88.jpg"
+        self.imageArea.set_from_file(os.getcwd()+self.fileloc)
 
         self.displayArea.set_editable(False)
 
@@ -155,7 +181,6 @@ class Window2(Gtk.Window):
         self.buttonSave.connect("clicked", self.on_buttonSave_clicked)
         self.imageSlider.connect("value-changed", self.on_imageSlider_moved)
         self.connect("destroy", self.on_window2_destroy)
-        self.set_default_size(600,338)
 
     def on_window2_destroy(self, widget):
         self.window1.show()
@@ -184,14 +209,20 @@ class Window2(Gtk.Window):
 
     def on_buttonSave_clicked(self, widget):
         print("save save")
+        win = FileSaveWindow()
+
+        if (win.saveFlag == True):
+            print(win.filepath)
+            print(self.fileloc)
+            os.rename(os.getcwd()+self.fileloc,win.filepath)
 
     def on_imageSlider_moved(self, get):
         print("moved moved")
         pos = self.imageSlider.get_value()
         pos =str(int(pos))
         print(pos)
-        fileloc = fileLocation+pos+".jpg"
-        self.imageArea.set_from_file(os.getcwd()+fileloc)
+        self.fileloc = fileLocation+pos+".jpg"
+        self.imageArea.set_from_file(os.getcwd()+self.fileloc)
 
 MainInstance = Main()
 Gtk.main()
