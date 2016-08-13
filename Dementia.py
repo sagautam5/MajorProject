@@ -6,6 +6,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from DementiaDetector import on_fileOpen
 
+fileLocation = "/home/abinash/Project/_Project/Dementia/Resource/Layers/layer"
+
 class FileChooserWindow(Gtk.Window):
 
     def __init__(self):
@@ -120,7 +122,7 @@ class Window2(Gtk.Window):
         self.imageSlider.set_draw_value(False)
         self.imageSlider.set_digits(0)
 
-        self.imageArea.set_from_file("/home/abinash/Project/Dementia/Resource/Layers/layer88.jpg")
+        self.imageArea.set_from_file(fileLocation+"88.jpg")
 
         self.displayArea.set_editable(False)
 
@@ -135,8 +137,6 @@ class Window2(Gtk.Window):
         print("win2des win2des")
 
     def on_buttonCheck_clicked(self, widget):
-
-#       print(handler.filePath)
 
         print("check check")
         text = ''
@@ -165,7 +165,7 @@ class Window2(Gtk.Window):
         pos = self.imageSlider.get_value()
         pos =str(int(pos))
         print(pos)
-        self.imageArea.set_from_file("/home/abinash/Project/Dementia/Resource/Layers/layer"+pos+".jpg")
+        self.imageArea.set_from_file(fileLocation+pos+".jpg")
 
 MainInstance = Main()
 Gtk.main()
