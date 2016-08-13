@@ -77,7 +77,7 @@ class Main:
     def __init__(self):
         self.filepath = ''
         builder1 = Gtk.Builder()
-        builder1.add_from_file("dementia.glade")
+        builder1.add_from_file(os.getcwd()+"/Resource/dementia.glade")
         builder1.connect_signals(self)
 
         self.window1 = builder1.get_object("window1")
@@ -108,15 +108,16 @@ class Main:
     def on_helpAbout_activate(self, widget):
         print("about")
         self.window1.hide()
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(os.getcwd()+'Resource/Logo.png')
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(os.getcwd()+'/Resource/Logo.png')
         builder = Gtk.Builder()
-        builder.add_from_file("dementia.glade")
+        builder.add_from_file(os.getcwd()+"/Resource/dementia.glade")
         about = builder.get_object("aboutDementia")
         about.set_program_name("Dementa Detector")
         about.set_version("1.0.0.1")
         about.set_logo(pixbuf)
-        about.set_authors("Sagar Gautam\nAbinash Manandhar\nSujan Sauden"+
-                        "\nDharma K. Shrestha")
+        authorList = ['Sagar Gautam', 'Abinash Manandhar','Sujan Sauden',
+                        'Dharma K. Shrestha']
+        about.set_authors(authorList)
         about.set_comments("Main purpose of the project is to identify "+
                             "dementia in MRI scan using machine learning"+
                             "algorithm. Training images are preprocessed"+
