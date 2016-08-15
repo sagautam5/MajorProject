@@ -33,17 +33,17 @@ def getLabel(Labels):
     else:
         label = 0
     return label
+def startjvm():
+    startJVM(jpype.getDefaultJVMPath());
 
 #Source = raw_input("Enter Image File Location:")
 def on_fileOpen(Source):
     #Source = '/home/abinash/Desktop/Untitled Folder/OAS1_0002_MR1_mpr_n4_anon_sbj_111.img'
-    startJVM(jpype.getDefaultJVMPath());
     myPackage = JPackage('FeatureExtraction').org.classes
     Dementia = myPackage.Dementia
 
     String = Dementia.System("Test",Source)
     Features = [float(x) for x in String.split()]
-
     ''' Best Approximated Value of Nearest Neighbours'''
     K = 7
 

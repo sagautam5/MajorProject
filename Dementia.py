@@ -5,7 +5,7 @@ import math
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk,GdkPixbuf
-from DementiaDetector import on_fileOpen
+from DementiaDetector import on_fileOpen,startjvm
 
 
 #fileLoc = "/home/abinash/Project/_Project/Dementia/"
@@ -76,6 +76,7 @@ class FileSaveWindow(Gtk.Window):
 class Main:
     def __init__(self):
         self.filepath = ''
+        startjvm()
         builder1 = Gtk.Builder()
         builder1.add_from_file(os.getcwd()+"/Resource/dementia.glade")
         builder1.connect_signals(self)
@@ -89,7 +90,7 @@ class Main:
     def on_fileOpen_activate(self, widget):
         print("open")
         win = FileChooserWindow()
-
+        
         if (win.openFlag == True):
             self.filePath = win.filepath
             print ("calling functin on_fileOpen")

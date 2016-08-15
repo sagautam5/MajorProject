@@ -1,0 +1,171 @@
+__version__= '0.1'
+
+__author__ = 'Sagar Gautam'
+import math
+
+import jpype
+
+from jpype import *
+
+from pybrain.tools.shortcuts import buildNetwork
+
+from pybrain.tools.xml.networkreader import NetworkReader
+
+from pybrain.structure import TanhLayer, SigmoidLayer
+
+# Normalize result
+def normalize(output):
+    if output[0] > output[1]:
+        return [1, 0]
+    else:
+        return [0, 1]
+
+# Measure euclidean distance between feature vectors  
+def edit_distance(feature1, feature2):
+    total=0
+    for i in range(len(feature1)):
+         total = total+(feature1[i]-feature2[i])*(feature1[i]-feature2[i])
+    distance = math.sqrt(total)
+    return distance
+
+# Assign majority class cabel to the label of new instance
+def get_label(labels):
+    count1 = 0
+    for label in range(len(labels)):
+        if labels[label] == 1:
+            count1 = count1 + 1
+    count0 = len(labels)-count1
+
+    if count1 > count0:
+        new_label = 1
+    else:
+        new_label = 0
+    return new_label
+
+class Model:
+    test_features = []
+    train = []
+    demented_file_no = 75
+    non_demented_file_no = 107
+
+    def __init__(self,Source):
+        self.Source = Source
+	if isJVMstarted():
+	
+        startJVM(jpype.getDefaultJVMPath());
+        myPackage = JPackage('FeatureExtraction').org.classes
+        dementia = myPackage.Dementia
+        string = dementia.System("Test",Source)
+        test_features = [float(x) for x in string.split()]
+        shutdownJVM();
+    
+    def KNN(self,K):
+        for i in range(0,demented_file_no):
+            filename = 'Resource/TrainData/Demented/Nearest/Image'+str(i)+'.txt'
+            data = [float(x) for x in open(filename).read().split()]
+            data_sample = (tuple(data), 0)
+            train.append(data_sample)
+
+        for j in range(0,non_demented_file_no):
+            filename = 'Resource/TrainData/NotDemented/Nearest/Image'+str(j)+'.txt'
+            data = [float(x) for x in open(filename).read().split()]
+            data_sample = (tuple(data), 1)
+            train.append(data_sample)
+
+        test_feature = tuple(test_features)
+        print test_feature
+        distance_vector = [1.0e+15]*K
+        label_vector = [1]*K
+
+        # KNN alorithm to test the new instances
+
+        for feature, label in train:
+            distance = edit_distance(feature, test_feature)
+            for value in range(K):
+                if distance < distance_vector[value]:
+                    distance_vector[value] = distance
+                    label_vector[value] = label
+                    break
+
+        # Assign majority label to label of test feature vector
+        new_label = get_label(label_vector) 
+        if  new_label == 0:
+            print "KNN Model: Dementia Positive"
+        if  new_label == 1:
+            print "KNN Model: Dementia Negative"
+
+    #def ANN(self):
+
+# Acess java class Dementia from package featureextraction to calculate feature fector  
+
+startJVM(jpype.getDefaultJVMPath());
+myPackage = JPackage('FeatureExtraction').org.classes # Location of Dementia.class
+dementia = myPackage.Dementia                         # Dementia.class file acess
+source = raw_input("Enter Test Image File Location:")
+string = dementia.System("Test",source)               # Static function System(....,....) call  
+features = [float(x) for x in string.split()]         # We get feature vector as string so to get numeric 
+	                                            # Spliting is required
+
+# Best Approximated Value of Nearest Neighbours
+K = 7
+
+demented_file_no = 75
+non_demented_file_no = 107
+
+# List of Training Data of type [(_,_,_),_]
+train = []
+# List of Test Data of type [(_,_,_),_]
+
+for i in range(0,demented_file_no):
+    filename = 'Resource/TrainData/Demented/Nearest/Image'+str(i)+'.txt'
+    data = [float(x) for x in open(filename).read().split()]
+    data_sample = (tuple(data), 0)
+    train.append(data_sample)
+
+for j in range(0,non_demented_file_no):
+    filename = 'Resource/TrainData/NotDemented/Nearest/Image'+str(j)+'.txt'
+    data = [float(x) for x in open(filename).read().split()]
+    data_sample = (tuple(data), 1)
+    train.append(data_sample)
+
+test_feature = tuple(features)
+distance_vector = [1.0e+15]*K
+label_vector = [1]*K
+
+# KNN alorithm to test the new instances
+
+for feature, label in train:
+    distance = edit_distance(feature, test_feature)
+    for value in range(K):
+        if distance < distance_vector[value]:
+            distance_vector[value] = distance
+            label_vector[value] = label
+            break
+
+# Assign majority label to label of test feature vector
+new_label = get_label(label_vector) 
+
+if  new_label == 0:
+    print "KNN Model: Dementia Positive"
+
+if  new_label == 1:
+    print "KNN Model: Dementia Negative"
+shutdownJVM(); 
+model = Model("Resource/Sample/Image5.img")
+model.KNN()
+# Network initialization
+network = buildNetwork(3, 2, 2, 2, bias=True, hiddenclass=TanhLayer)
+
+# Assign Weights to the neural network from xml file
+network = NetworkReader.readFrom('filename.xml') 
+
+# Get output of the neural netwok 
+output = network.activate(features) 
+# Get final result from output
+prediction = normalize(output)
+
+if(prediction == [0, 1]):
+    print "Neural Network: Dementia Positive"
+if(prediction == [1, 0]):
+    print "Neural Network: Dementia Negative"
+
