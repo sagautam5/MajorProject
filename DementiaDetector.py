@@ -2,7 +2,7 @@ import math
 import jpype
 from jpype import *
 from pybrain.tools.shortcuts import buildNetwork
-from pybrain.tools.xml.networkreader import NetworkReader
+from pybrain.tools.customxml.networkreader import NetworkReader
 from pybrain.structure import TanhLayer, SigmoidLayer
 
 '''Result Normalizer'''
