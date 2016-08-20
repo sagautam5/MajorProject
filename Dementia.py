@@ -151,45 +151,56 @@ class Window2(Gtk.Window):
         self.text2 = ''
         self.window1 = window1
         self.adjustment= Gtk.Adjustment(88, 1, 176, 0, 1, 0)
-        self.buttonCheck = Gtk.Button(label="Check")
+        self.buttonCheck = Gtk.Button(label="  Check  ")
         self.buttonSave = Gtk.Button(label="Save Image")
         self.imageSlider = Gtk.VScale(adjustment = self.adjustment)
         self.imageArea = Gtk.Image()
         self.displayResult = Gtk.TextView()
         self.displayTitle = Gtk.TextView()
+        self.imageTitle = Gtk.TextView()
         color = Gdk.RGBA()
         color.parse('#f2f1ef')
         color.to_string()
         self.displayResult.override_background_color(Gtk.StateType.NORMAL, color)
         self.displayTitle.override_background_color(Gtk.StateType.NORMAL, color)
+        self.imageTitle.override_background_color(Gtk.StateType.NORMAL, color)
         self.textBuf1 = self.displayTitle.get_buffer()
         self.textBuf2 = self.displayResult.get_buffer()
-        self.tag_bold = self.textBuf1.create_tag("bold",
-                            weight=Pango.Weight.BOLD)
+        self.textBuf3 = self.imageTitle.get_buffer()
+
         self.tag_italic = self.textBuf2.create_tag("italic",
-                            style=Pango.Style.ITALIC)
+                            style = Pango.Style.ITALIC)
         self.tag_underline = self.textBuf1.create_tag("underline",
-                            underline=Pango.Underline.SINGLE)
+                            underline = Pango.Underline.SINGLE)
+        self.tag_underline2 = self.textBuf3.create_tag("underline",
+                            underline = Pango.Underline.SINGLE)
+        self.tag_bold = self.textBuf1.create_tag("bold",
+                            weight = Pango.Weight.BOLD)
+        self.tag_bold2 = self.textBuf3.create_tag("bold",
+                            weight = Pango.Weight.BOLD)
+
 
 
         Gtk.Window.__init__(self, title= "Dementia Detector")
 
         grid = Gtk.Grid()
-        grid.set_column_spacing(10)
-        grid.set_row_spacing(10)
+        grid.set_column_spacing(1)
+        grid.set_row_spacing(15)
         self.add(grid)
 
-        grid.attach(self.imageArea, 3, 333, 10, 10)
+        grid.attach(self.imageTitle, 1, 1, 2, 1)
+        grid.attach_next_to(self.imageArea, self.imageTitle,
+                                Gtk.PositionType.BOTTOM,10,10)
         grid.attach_next_to(self.imageSlider, self.imageArea,
                                 Gtk.PositionType.RIGHT, 1, 10)
         grid.attach_next_to(self.buttonCheck, self.imageArea,
-                                Gtk.PositionType.BOTTOM, 2, 1)
+                                Gtk.PositionType.BOTTOM, 1, 2)
         grid.attach_next_to(self.buttonSave, self.buttonCheck,
-                                Gtk.PositionType.RIGHT, 7, 1)
-        grid.attach_next_to(self.displayTitle, self.imageSlider,
-                                Gtk.PositionType.RIGHT, 20, 2)
-        grid.attach_next_to(self.displayResult, self.displayTitle,
-                                Gtk.PositionType.BOTTOM, 20, 10)
+                                Gtk.PositionType.RIGHT, 7, 2)
+        grid.attach_next_to(self.displayResult, self.imageSlider,
+                                Gtk.PositionType.RIGHT, 20, 10)
+        grid.attach_next_to(self.displayTitle, self.displayResult,
+                                Gtk.PositionType.TOP, 20, 2)
 
         self.imageSlider.set_digits(0)
         self.imageSlider.set_draw_value(False)
@@ -200,12 +211,19 @@ class Window2(Gtk.Window):
 
         self.displayTitle.set_editable(False)
         self.displayResult.set_editable(False)
+        self.imageTitle.set_editable(False)
 
-        self.text1 = '      Results from ANN and KNN:       '
+
+        self.text1 = '\n    Results from ANN and KNN:       \n   -----------------------------------------       '
         self.textBuf1.set_text(self.text1)
         start, end = self.textBuf1.get_bounds()
-        self.textBuf1.apply_tag(self.tag_underline, start, end)
+        self.textBuf1.apply_tag(self.tag_bold, start, end)
         self.displayTitle.set_buffer(self.textBuf1)
+
+        self.textBuf3.set_text('        Preprocessed Image  \n        -------------------------------  ')
+        start, end = self.textBuf3.get_bounds()
+        self.textBuf3.apply_tag(self.tag_bold2, start, end)
+        self.imageTitle.set_buffer(self.textBuf3)
 
         self.buttonCheck.connect("clicked", self.on_buttonCheck_clicked)
         self.buttonSave.connect("clicked", self.on_buttonSave_clicked)
@@ -216,12 +234,15 @@ class Window2(Gtk.Window):
         self.window1.show()
         print("win2des win2des")
 
+
     def on_buttonCheck_clicked(self, widget):
+
+        self.text2 = ''
+        self.textBuf2 = self.displayResult.get_buffer()
 
         print("check check")
         from DementiaDetector import newLabel, predictionResult
-        print(newLabel)
-        print(predictionResult)
+        print(newLabel,predictionResult)
         if (newLabel == 0):
             self.text2 += '\n\n\nKNN Model : Dementia Positive'
         else:
@@ -245,10 +266,9 @@ class Window2(Gtk.Window):
             os.rename(os.getcwd()+self.fileloc,win.filepath)
 
     def on_imageSlider_moved(self, get):
-        print("moved moved")
         pos = self.imageSlider.get_value()
         pos =str(int(pos))
-        print(pos)
+        #print(pos)
         self.fileloc = fileLocation+pos+".jpg"
         self.imageArea.set_from_file(os.getcwd()+self.fileloc)
 
